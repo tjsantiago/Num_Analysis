@@ -1,0 +1,127 @@
+import scipy.optimize as optimize
+
+#bisection function
+
+def bisect(f, a, b, TOL, NMAX):
+    '''Uses bisection method to find a root of a user-defined function
+    f on interval [a,b] within a specified tolerance TOL and
+    maximum number of iterations NMAX
+    '''
+    N = 1
+    while N <= NMAX: #set max number of iterations for while loop
+        c = (a + b)/2 #set new midpoint
+        if f(c) == 0 or (b - a)/2 <= TOL: #will return c when solution found
+            return c, "The number of iterations necessary was: " + str(N)
+        N += 1 #increment counter
+        if f(c) < 0 and f(a) < 0: #setting new interval
+            a = c
+        elif f(c) > 0 and f(a) > 0:
+            a = c
+        else:
+            b = c
+    return "Method failed." #returns failure if max iterations reached without solution
+
+#Example:
+
+def f_3(x):
+    return ((x**3)-(7*(x**2))+(14*(x))-6)
+    
+#part a, interval [0,1]
+print(bisect(f_3, 0, 1, 1e-2, 10))
+print(optimize.bisect(f_3, 0, 1)) #using scipy to check solution
+
+#part b, interval [1, 3.2]
+print(bisect(f_3, 1, 3.2, 1e-2, 10))
+print(optimize.bisect(f_3, 1, 3.2))
+
+#part c, interval [3.2, 4]
+print(bisect(f_3, 3.2, 4, 1e-2, 10))
+print(optimize.bisect(f_3, 3.2, 4))
+
+
+#Newton's Method
+
+def Newton(f, f1, p_0, TOL, NMAX):
+    '''uses newton's method to find a root of a function f. f1 is the first
+    derivative of f, p_0 is the initial approximation, TOL is the tolerance of
+    the solution, and NMAX is the maximum number of iterations to be allowed
+    '''
+    i = 1
+    while i <= NMAX:
+        p = p_0 - (f(p_0)/f1(p_0))
+        if abs(p - p_0) < TOL:
+            return p, "The method was successful after %s iterations." %i
+        i += 1
+        p_0 = p
+    return "The method failed after %s iterations" %NMAX
+
+#Example:
+
+#part a, p_0 = 2.5
+def f5a(x):
+    return (x**3) - (2*(x**2)) - 5
+
+def f5a_1(x):
+    '''First derivative of f5a(x)'''
+    return (3*(x**2)) - (4*x)
+    
+print(Newton(f5a, f5a_1, 2.5, 1e-4, 20))
+
+
+#Secant Method
+
+def Secant(f, p_0, p_1, TOL, NMAX):
+    '''uses the secant method to find a root of a function f. p_0 and p_1 are
+    initial approximations, TOL is the tolerance of the solution and NMAX is
+    the maximum number of iterations to be allowed
+    '''
+    i = 2
+    q_0 = f(p_0)
+    q_1 = f(p_1)
+    while i <= NMAX:
+        p = p_1 - ((q_1*(p_1 - p_0))/(q_1 - q_0)) #computing p_i
+        if abs(p - p_1) < TOL: #check if the procedure was succesful
+            return p, "The Method was successful after %s iterations." %(i - 1)
+        i += 1
+        p_0 = p_1 #update p_0, q_0, p_1, and q_1
+        q_0 = q_1
+        p_1 = p
+        q_1 = f(p)
+    return "The method failed after %s iterations." %NMAX
+
+
+#Method of False Position
+
+def FalsePos(f, p_0, p_1, TOL, NMAX):
+    '''uses the method of false positions to find a root within tolerance TOL
+    for the function f given initial approximations p_0 and p_1, within iterations
+    NMAX
+    '''
+    if f(p_0) * f(p_1) < 0:
+        i = 2
+        q_0 = f(p_0)
+        q_1 = f(p_1)
+        while i <= NMAX:
+            p = p_1 - ((q_1*(p_1 - p_0))/(q_1 - q_0)) #computing p_i
+            if abs(p - p_1) < TOL: #check if the procedure was succesful
+                return p, "The method was successful after %s iterations." %(i-1)
+            i += 1
+            q = f(p)
+            if q * q_1 < 0: #check the signs and update variables
+                p_0 = p_1
+                q_0 = q_1
+            else:
+                p_1 = p
+                q_1 = q
+        return p, "The method failed after %s iterations." %NMAX
+    else:
+        return "f(p_0) and f(p_1) must have opposite signs."
+
+#Example:
+
+#Number 23, interest rate, p_0 = 0.001 (0.1%), p_1 = 0.1 (10%)
+
+def f23(x):
+    return (1000/x)*(1-((1+x)**-360)) - 135000
+
+print(FalsePos(f23, 0.001, 0.1, 1e-10, 1000))
