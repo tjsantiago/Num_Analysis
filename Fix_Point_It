@@ -1,0 +1,23 @@
+#Fixed-point iteration function
+
+def fix_point(g, p_0, TOL, NMAX):
+    '''Given an initial guess p_0 and a maximum number of iterations NMAX,
+    uses fixed point iteration to find a root of a user-defined
+    function g within tolerance TOL    
+    '''
+    i = 1
+    while i <= NMAX:
+        p = g(p_0)
+        if abs(p - p_0) < TOL:
+            return p, "The method was successful after %s iterations." %i
+        i += 1
+        p_0 = p
+    return "The Method was unsuccessful."
+
+
+#Example:
+
+def g_10(x):
+    return (2**(-x))
+    
+print(fix_point(g_10, 1/3, 1e-4, 20))
