@@ -1,0 +1,40 @@
+import scipy.optimize as optimize
+
+#bisection function
+
+def bisect(f, a, b, TOL, NMAX):
+    '''Uses bisection method to find a root of a user-defined function
+    f on interval [a,b] within a specified tolerance TOL and
+    maximum number of iterations NMAX
+    '''
+    N = 1
+    while N <= NMAX: #set max number of iterations for while loop
+        c = (a + b)/2 #set new midpoint
+        if f(c) == 0 or (b - a)/2 <= TOL: #will return c when solution found
+            return c, "The number of iterations necessary was: " + str(N)
+        N += 1 #increment counter
+        if f(c) < 0 and f(a) < 0: #setting new interval
+            a = c
+        elif f(c) > 0 and f(a) > 0:
+            a = c
+        else:
+            b = c
+    return "Method failed." #returns failure if max iterations reached without solution
+
+
+#Example:
+
+def f_3(x):
+    return ((x**3)-(7*(x**2))+(14*(x))-6)
+    
+#part a, interval [0,1]
+print(bisect(f_3, 0, 1, 1e-2, 10))
+print(optimize.bisect(f_3, 0, 1)) #using scipy to check solution
+
+#part b, interval [1, 3.2]
+print(bisect(f_3, 1, 3.2, 1e-2, 10))
+print(optimize.bisect(f_3, 1, 3.2))
+
+#part c, interval [3.2, 4]
+print(bisect(f_3, 3.2, 4, 1e-2, 10))
+print(optimize.bisect(f_3, 3.2, 4))
