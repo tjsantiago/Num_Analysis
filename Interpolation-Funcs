@@ -1,0 +1,54 @@
+import numpy as np
+
+#Neville's Method function
+#vec_x is a vector of x values, f_x is the value of the function at each x in vec_x
+
+def Neville(x, vec_x, f_x):
+    '''Computes interpolation for a point x using Neville's Method given a vector of x values vec_x
+    and a vector, f_x, of corresponding y values for each value in vec_x'''
+    
+    n = np.size(vec_x) - 1
+    Q_table = np.zeros((n+1, n+1)) #create an n x n matrix of zeros
+    
+    for i in np.arange(0, n+1): #set the vector f_x as the first column in Q_table
+        Q_table[i][0] = f_x[i]
+        
+    for j in np.arange(1, n+1):
+        for i in np.arange(j, n+1): #set the value for Q_table[i][j]
+            Q_table[i][j] = (((x - vec_x[i-j])*Q_table[i][j-1]) - ((x - vec_x[i])*Q_table[i-1][j-1]))/(vec_x[i] - vec_x[i - j])
+            
+    #output the approximation and the Q_table
+    return(Q_table[n][n], Q_table)
+
+#Example:
+
+#Number 1
+#part b
+#x = -1/3
+
+#degree one
+x1b1 = [-0.5, -0.25]
+f_x1b1 = [-0.02475, 0.3349375]
+
+P_xb1, Qtableb1 = Neville(-1/3, x1b1, f_x1b1)
+print("The approximation for f(-1/3) using a polynomial of degree one is: %.4f" %(P_xb1))
+print("The values of the Q_table are: ")
+print(Qtableb1)
+
+#degree two
+x1b2 = [-0.5, -0.25, 0]
+f_x1b2 = [-0.02475, 0.3349375, 1.101]
+
+P_xb2, Qtableb2 = Neville(-1/3, x1b2, f_x1b2)
+print("The approximation for f(-1/3) using a polynomial of degree two is: %.4f" %(P_xb2))
+print("The values of the Q_table are: ")
+print(Qtableb2)
+
+#degree three
+x1b3 = [-0.5, -0.25, 0, -0.75]
+f_x1b3 = [-0.02475, 0.3349375, 1.101, -0.07181250]
+
+P_xb3, Qtableb3 = Neville(-1/3, x1b3, f_x1b3)
+print("The approximation for f(-1/3) using a polynomial of degree three is: %.4f" %(P_xb3))
+print("The values of the Q_table are: ")
+print(Qtableb3)
