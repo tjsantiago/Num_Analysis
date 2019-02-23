@@ -52,3 +52,86 @@ P_xb3, Qtableb3 = Neville(-1/3, x1b3, f_x1b3)
 print("The approximation for f(-1/3) using a polynomial of degree three is: %.4f" %(P_xb3))
 print("The values of the Q_table are: ")
 print(Qtableb3)
+
+
+#Divided Differences
+
+def DivDif(x, vec_x, f_x):
+    '''Computes coefficients for the interpolating polynomial
+      about a point x using Newton's Divided-Difference Formula'''
+    
+    n = np.size(vec_x) - 1
+    F_table = np.zeros((n+1, n+1)) #create an n x n matrix of zeros
+    
+    for i in np.arange(0, n+1): #set the vector f_x as the first column in Q_table
+        F_table[i][0] = f_x[i]
+        
+    for j in np.arange(1, n+1):
+        for i in np.arange(j, n+1): #set the value for F_table[i][j]
+            F_table[i][j] = ((F_table[i][j-1]) - (F_table[i-1][j-1]))/(vec_x[i] - vec_x[i - j])
+            
+    #output the approximation and the F_table
+    return(F_table)
+    
+#Example:
+#degree one
+x1a1 = [8.1, 8.3]
+f_x1a1 = [16.94410, 17.56492]
+
+Ftable = DivDif(8.4, x1a1, f_x1a1)
+print("The coefficients are on the diagonal of the following table: ")
+print(Ftable)
+
+#degree two
+x1a2 = [8.1, 8.3, 8.6]
+f_x1a2 = [16.94410, 17.56492, 18.50515]
+
+Ftable = DivDif(8.4, x1a2, f_x1a2)
+print("The coefficients are on the diagonal of the following table: ")
+print(Ftable)
+
+#degree three
+x1a3 = [8.1, 8.3, 8.6, 8.7]
+f_x1a3 = [16.94410, 17.56492, 18.50515, 18.82091]
+
+Ftable = DivDif(8.4, x1a3, f_x1a3)
+print("The coefficients are on the diagonal of the following table: ")
+print(Ftable)
+
+
+
+#Forward Difference Table
+
+def ForDifTable(vec_x, f_x):
+    '''Computes the table of forward difference coefficients for Newton's
+    forward difference formula'''
+    
+    n = np.size(vec_x) - 1
+    
+    Table = np.zeros((n+1, n+1))
+    
+    for i in np.arange(0, n+1): #set the vector f_x as the first column in Table
+        Table[i][0] = f_x[i]
+        
+    for j in np.arange(1, n+1):
+        for i in np.arange(j, n+1): #set the value for Table[i][j]
+            Table[i][j] = round(Table[i][j-1] - Table[i-1][j-1], 6)
+    
+    return(Table)
+
+#Example:
+#part a
+x3a = [-0.75, -0.5, -0.25, 0]
+f_x3a = [-0.0718125, -0.02475, 0.3349375, 1.101]
+
+DifTable3a = ForDifTable(x3a, f_x3a)
+print("The values of the forward difference table are: ")
+print(DifTable3a)
+
+#part b
+x3b = [0.1, 0.2, 0.3, 0.4]
+f_x3b = [-0.62049958, -0.28398668, 0.00660095, 0.2484244]
+
+DifTable3b = ForDifTable(x3b, f_x3b)
+print("The values of the forward difference table are: ")
+print(DifTable3b)
