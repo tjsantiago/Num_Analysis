@@ -124,4 +124,11 @@ def FalsePos(f, p_0, p_1, TOL, NMAX):
 def f23(x):
     return (1000/x)*(1-((1+x)**-360)) - 135000
 
+def f23_1(x):
+    '''First derivative of f23(x)'''
+    return -1000*(x**(-2)) - (-360000*(x**(-1))*((1 + x)**(-361)) - 1000*(x**(-2))*((1+x)**(-360)))
+
+print("Number 23: ")
 print(FalsePos(f23, 0.001, 0.1, 1e-10, 1000))
+print(Newton(f23, f23_1, .001, 1e-6, 1000))
+print("End Number 23.")
