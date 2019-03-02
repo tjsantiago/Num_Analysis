@@ -240,3 +240,13 @@ def N_cubic_spline(x, a):
         d_coeffs.append(d[j])
     
     return a_coeffs, b_coeffs, c_coeffs, d_coeffs
+
+#Example:
+x = [8.3, 8.6]
+f = [17.56492, 18.50515]
+
+x1 = [0, 0.25, 0.5, 1, 1.25]
+f1 = [0, 22.99, 46.73, 97.35, 124.06]
+
+print(N_cubic_spline(x, f))
+print(N_cubic_spline(x1, f1))
