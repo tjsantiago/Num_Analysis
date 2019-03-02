@@ -182,3 +182,61 @@ vec_dfx1d = [3.58502082, 3.14033271, 2.66668043, 2.16529366]
 Htable1d = Hermite(vec_x1d, vec_fx1d, vec_dfx1d)
 print("The coefficients are along the diagonal of the following table: ")
 print(Htable1d)
+
+
+#natural cubic splines
+
+def N_cubic_spline(x, a):
+    '''returns the coefficients of the natural cubic spline
+    interpolant for a function'''
+    
+    n = np.size(x) - 1
+    
+    #set size of different variables
+    h = np.zeros((n, 1))
+    alpha = np.zeros((n, 1))
+    l = np.zeros((n+1, 1))
+    mu = np.zeros((n+1, 1))
+    z = np.zeros((n+1, 1))
+    c = np.zeros((n+1, 1))
+    b = np.zeros((n+1, 1))
+    d = np.zeros((n+1, 1))
+    
+    #calculate coefficients
+    for i in np.arange(n):
+        h[i] = x[i+1] - x[i]
+    
+    for i in np.arange(1, n):
+        alpha[i] = (3/h[i])*(a[i+1] - a[i]) - (3/h[i-1])*(a[i] - a[i-1])
+    
+    l[0] = 1
+    mu[0] = 0
+    z[0] = 0
+    
+    for i in np.arange(1, n):
+        l[i] = 2*(x[i+1] - x[i-1]) - h[i-1]*mu[i-1]
+        mu[i] = h[i]/l[i]
+        z[i] = (alpha[i] - h[i-1]*z[i-1])/l[i]
+        
+    l[n] = 1
+    z[n] = 0
+    c[n] = 0
+    
+    for j in np.arange(n-1, -1, -1):
+        c[j] = z[j] - mu[j]*c[j+1]
+        b[j] = ((a[j+1] - a[j])/h[j]) - ((h[j]*(c[j+1] + 2*c[j]))/3)
+        d[j] = (c[j+1] - c[j])/(3*h[j])
+     
+    #get coefficients sorted for output
+    a_coeffs = []
+    b_coeffs = []
+    c_coeffs = []
+    d_coeffs = []
+    
+    for j in np.arange(0, n):
+        a_coeffs.append(a[j])
+        b_coeffs.append(b[j])
+        c_coeffs.append(c[j])
+        d_coeffs.append(d[j])
+    
+    return a_coeffs, b_coeffs, c_coeffs, d_coeffs
