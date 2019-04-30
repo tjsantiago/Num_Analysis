@@ -1,0 +1,87 @@
+#Euler's Method
+
+def Euler(f, a, b, alpha, h=None, N=None):
+    '''Uses Euler's method to find a solution to an initial value problem
+    f is the ODE which we would like to solve, in the form f(t, y).
+    a and b are the end points of the problem.
+    alpha is the initial value.
+    Optional parameter h is the step size.
+    Optional parameter N is the number of steps.
+    '''
+    
+    t = a
+    w = alpha
+    print("The starting point is: ")
+    print("(" + str(t) + ", " + str(w) + ")")
+    
+    if h == None and N != None:
+        h = (b - a)/N
+        
+    elif h == None and N == None:
+        h = 0.5
+        N = (b - a)/h
+        
+    elif h != None and N == None:
+        N = (b - a)/h
+    
+    for i in np.arange(1, N+1):
+        w += h*f(t, w)
+        t = a + i*h
+        
+    print("The solution is: ")
+    print("(" + str(t) + ", " + str(w) + ")")
+
+#Example
+def f1b(t, y):
+    return 1 + (t - y)**2
+
+Euler(f1b, 2, 3, 1, h=0.5)
+
+
+#Runge-Kutta Method (Order Four)
+
+def RK4(f, a, b, alpha, h=None, N=None):
+    '''Uses fourth order Runge-Kutta Method to
+    approximate the solution to an initial value problem.
+    
+    f: ode in form f(t, y)
+    a and b: endpoints
+    alpha: initial value
+    h (optional): step size
+    N (optional): number of steps
+    '''
+    
+    if h == None and N != None:
+        h = (b - a)/N
+        
+    elif h == None and N == None:
+        h = 0.5
+        N = (b - a)/h
+        
+    elif h != None and N == None:
+        N = (b - a)/h
+        
+    t = a
+    w = alpha
+    print("Starting point: (%f, %f)"%(t, w))
+    
+    for i in np.arange(1, N+1):
+        K_1 = h*f(t, w)
+        K_2 = h*f(t + (h/2), w + (K_1/2))
+        K_3 = h*f(t + (h/2), w + (K_2/2))
+        K_4 = h*f(t + h, w + K_3)
+        
+        w += (K_1 + 2*K_2 + 2*K_3 + K_4)/6
+        t = a + i*h
+        
+    if i == N:
+        print("The approximate solution is: (%f, %f)"%(t, w))
+    
+    else:
+        print("The current position is: (%f, %f)"%(t, w))
+
+#Example
+def f13a(t, y):
+    return t*np.exp(3*t) - 2*y
+    
+RK4(f13a, 0, 1, 0, h=0.5)
