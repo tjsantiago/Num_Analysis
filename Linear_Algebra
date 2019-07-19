@@ -1,0 +1,270 @@
+#Gauss Elimination with Backward Substitution
+def Gauss_Back(A):
+    '''Attempts to solve an nxn matrix using gaussian elimination
+    with backwards substitution.
+    
+    Parameters:
+        A: an nxn+1 augmented matrix, where the n+1 column is 
+        the right hand side of the system.
+    '''
+    
+    n = A.shape[0]
+    
+    for i in range(0, n-1):
+        p = abs(A[i, i])
+        minRow = i
+        for j in range(i+1, n):
+            if abs(A[j, i]) < p and abs(A[j, i]) != 0:
+                p = abs(A[j, i])
+                minRow = j
+        
+        if p == 0:
+            print("No unique solution")
+            return
+            
+        if minRow != i:
+            print("Swapping rows {} and {}".format(i, minRow))
+            A[[minRow, i]] = A[[i, minRow]]
+            
+        for j in range(i+1, n):
+             m = A[j, i]/A[i, i]
+             
+             temp = A[j] - m*A[i]
+             A[j] = temp
+    
+    if A[n-1, n-1] == 0:
+        print("No unique solution exists")
+        return
+    
+    x = [0 for i in range(n)]
+    
+    x[n-1] = A[n-1, n]/A[n-1, n-1]
+    
+    for i in range(n-1, -1, -1):
+        sub = 0
+        for j in range(i+1, n):
+            sub += A[i, j]*x[j]
+            
+        x[i] = (A[i, n] - sub)/A[i, i]
+   
+    print("Solution: ")     
+    print(x)
+    return
+
+#Example
+A1a = np.matrix('1 -5 1 7; 10 0 20 6; 5 0 -1 4')
+Gauss_Back(A1a)
+
+
+#Gaussian elimination with partial pivoting
+def Gauss_Partial_Piv(A):
+    '''Uses gaussian elimination with partial pivoting
+    in an attempt to solve a linear system.
+    
+    Parameters:
+        A: an nxn+1 matrix, where the n+1 column is the right
+        hand side of the augmented system
+    '''
+    
+    n = A.shape[0]
+    
+    NROW = [i for i in range(n)]
+    
+    for i in range(n-1):
+        p = i
+        temp = abs(A[NROW[p], i])
+        for j in range(i+1, n):
+            if abs(A[j, i]) < temp and abs(A[j, i]) == max([abs(A[NROW[h], i]) for h in range(i, n-1)]):
+                temp = abs(A[j, i])
+                p = j
+        
+        if temp == 0:
+            print("No unique solution exists")
+            return
+        
+        if NROW[i] != NROW[p]:
+            NCOPY = NROW[i]
+            NROW[i] = NROW[p]
+            NROW[p] = NCOPY
+            
+        for j in range(i+1, n):
+            m = A[NROW[j], i]/A[NROW[i], i]
+            
+            sub = A[NROW[j]] - m*A[NROW[i]]
+            A[j] = sub
+    
+    if A[NROW[n-1], n] == 0:
+        print("No unique solution exists")
+        return
+        
+    x = [0 for i in range(n)]
+    
+    x[n-1] = A[NROW[n-1], n]/A[NROW[n-1], n-1]
+    
+    for i in range(n-1, -1, -1):
+        sub = 0
+        for j in range(i+1, n):
+            sub += A[NROW[i], j]*x[j]
+            
+        x[i] = (A[NROW[i], n] - sub)/A[NROW[i], i]
+    
+    print("Solution: ")    
+    print(x)
+    return
+
+#Example
+Gauss_Partial_Piv(A1a)
+
+
+#LU Factorization
+def LU_Factor(A):
+    '''Factors an nxn matrix in LU form.
+    
+    Parameters:
+        A: an nxn matrix of type np.matrix
+    '''
+    
+    n = A.shape[0]
+    
+    L = np.zeros((n, n))
+    U = np.zeros((n, n))
+    
+    L[0][0] = 1
+    
+    U[0][0] = A[0, 0]/L[0][0]
+    
+    if L[0][0]*U[0][0] == 0:
+        print("Factorization impossible.")
+        return
+    
+    for j in range(1, n):
+        U[0][j] = A[0, j]/L[0][0]
+        L[j][0] = A[j, 0]/U[0][0]
+        
+    for i in range(1, n-1):
+        L[i][i] = 1
+        
+        sub = 0
+        for k in range(0, i):
+            sub += L[i][k]*U[k][i]
+        
+        U[i][i] = (A[i, i] - sub)/L[i][i]
+        
+        if L[i][i]*U[i][i] == 0:
+            print("Factorization impossible.")
+            return
+            
+        for j in range(i+1, n):
+            sub1 = 0
+            sub2 = 0
+            for k in range(0, i):
+                sub1 += L[i][k]*U[k][j]
+                sub2 += L[j][k]*U[k][i]
+                
+            U[i][j] = (1/L[i][i])*(A[i, j] - sub1)
+            L[j][i] = (1/U[i][i])*(A[j, i] - sub2)
+            
+    L[n-1][n-1] = 1
+    sub = 0
+    for k in range(0, n-1):
+        sub += L[n-1][k]*U[k][n-1]
+        
+    U[n-1][n-1] = (A[n-1, n-1] - sub)/L[n-1][n-1]
+    
+    if L[n-1][n-1]*U[n-1][n-1] == 0:
+        print("A is singular.")
+        
+    print("L = {}".format(L))
+    print("U = {}".format(U))
+    return
+
+#Example
+A5a = np.matrix([[2, -1, 1], [3, 3, 9], [3, 3, 5]])
+LU_Factor(A5a)
+
+
+#Jacobi Iterative Technique
+def Jacobi(A, b, TOL=1e-5, N=1000):
+    '''Solves a system Ax = b using the Jacobi iterative technique
+    
+    Parameters:
+        A: LHS matrix of the system of equations input as a numpy array
+        b: RHS of system input as a numpy array
+        TOL (optional): tolerance for solution. Default is 1e-5
+        N (optional): Maximum number of iterations. Default is 1000
+    '''
+    
+    n = A.shape[0]
+    x = np.zeros_like(b)
+    k = 1
+    
+    while k <= N:
+        x_new = np.zeros_like(x)
+        for i in range(n):
+            sub1 = np.dot(A[i, :i], x[:i])
+            sub2 = np.dot(A[i, i + 1:], x[i + 1:])
+            x_new[i] = (b[i] - sub1 - sub2)/A[i, i]
+            
+        temp = x - x_new
+        
+        if np.linalg.norm(temp, np.inf) < TOL:
+            print("Solution after {} iterations: ".format(k))
+            print(x)
+            return
+        
+        k += 1
+        x = x_new
+        
+    print("Maximum number of iterations exceeded.")
+    print("Solution at final iteration: ")
+    print(x)
+    return
+
+#Example
+A1a = np.array([[3, -1, 1],
+                [3, 6, 2],
+                [3, 3, 7]])
+b1a = np.array([1, 0, 4])
+
+Jacobi(A1a, b1a, TOL=1e-3)
+
+
+#Gauss-Seidel Iterative Method
+def Gauss_Seidel(A, b, TOL=1e-5, N=1000):
+    '''Solves a system Ax = b using the Gauss-Seidel iterative technique
+    
+    Parameters:
+        A: LHS matrix of the system of equations input as a numpy array
+        b: RHS of system input as a numpy array
+        TOL (optional): tolerance for solution. Default is 1e-5
+        N (optional): Maximum number of iterations. Default is 1000
+    '''
+    
+    n = A.shape[0]
+    x = np.zeros_like(b)
+    k = 1
+    
+    while k <= N:
+        x_new = np.zeros_like(x)
+        for i in range(n):
+            sub1 = np.dot(A[i, :i], x_new[:i])
+            sub2 = np.dot(A[i, i + 1:], x[i + 1:])
+            x_new[i] = (b[i] - sub1 - sub2)/A[i, i]
+            
+        temp = x - x_new
+        
+        if np.linalg.norm(temp, np.inf) < TOL:
+            print("Solution after {} iterations: ".format(k))
+            print(x)
+            return
+        
+        k += 1
+        x = x_new
+    
+    print("Maximum number of iterations exceeded.")
+    print("Solution at final iteration: ")
+    print(x)
+    return
+
+#Example
+Gauss_Seidel(A1a, b1a, TOL=1e-3)
