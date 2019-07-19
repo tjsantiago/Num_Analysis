@@ -1,0 +1,107 @@
+#Difference Formulas Differentiation
+
+def ForBack_Dif(x, f_x):
+    '''Uses forward and backward difference formulas
+    to approximate the derivative at each point given in a vector x'''
+    
+    n = np.size(x) - 1
+    df_x = np.zeros((1, n + 1))
+    
+    #forward difference
+    for i in np.arange(n):
+        df_x[0][i] = (f_x[i+1] - f_x[i])/(x[i+1] - x[i])
+    
+    #backward difference to determine last value
+    df_x[0][n] = (f_x[n] - f_x[n-1])/(x[n] - x[n-1])
+    
+    return df_x
+    
+#Example
+#Part a
+x1a = [0.5, 0.6, 0.7]
+f_x1a = [0.4794, 0.5646, 0.6442]    
+    
+print(ForBack_Dif(x1a, f_x1a))
+
+#Part b
+x1b = [0, 0.2, 0.4]
+f_x1b = [0, 0.74140, 1.3718]
+
+print(ForBack_Dif(x1b, f_x1b))
+
+
+#Three-Point Formula
+
+def Three_Point(x, f_x):
+    '''Uses the three-point endpoint and three-point midpoint
+    formulas to approximate the derivative at each point given in a vector x
+    '''
+    
+    n = np.size(x)
+    df_x = np.zeros((1, n))
+    
+    #Set derivative values
+    for i in np.arange(n):
+        
+        #endpoints
+        if i == 0:
+            df_x[0][i] = (-3*f_x[i] + 4*f_x[i+1] - f_x[i+2])/(x[i+2] - x[i])
+        elif i == n-1:
+            df_x[0][i] = (3*f_x[i] - 4*f_x[i-1] + f_x[i-2])/(x[i] - x[i-2])
+        #midpoints
+        else:
+            df_x[0][i] = (f_x[i-1] - f_x[i+1])/(x[i-1] - x[i+1])
+    
+    return df_x
+
+#Example
+#Part a
+x5a = [1.1, 1.2, 1.3, 1.4]
+f_x5a = [9.025013, 11.02318, 13.46374, 16.44465]
+
+print(Three_Point(x5a, f_x5a))
+
+#Part d
+x5d = [2.0, 2.1, 2.2, 2.3]
+f_x5d = [3.6887983, 3.6905701, 3.6688192, 3.6245909]
+
+print(Three_Point(x5d, f_x5d))
+
+
+#Five-Point Formula
+
+def Five_Point(x, f_x):
+    '''Uses the five-point endpoint and five-point midpoint
+    formulas to approximate the derivative at each point given
+    in a vector x
+    '''
+    
+    n = np.size(x)
+    df_x = np.zeros((1, n))
+    
+    #Set derivative values
+    for i in np.arange(n):
+        
+        #endpoints
+        if i == 0 or i == 1:
+            df_x[0][i] = (-25*f_x[i] + 48*f_x[i+1] - 36*f_x[i+2] + 16*f_x[i+3] - 3*f_x[i+4])
+            df_x[0][i] /= 3*(x[i+4] - x[i])
+            
+        elif i == n-1 or i == n-2:
+            df_x[0][i] = (25*f_x[i] - 48*f_x[i-1] + 36*f_x[i-2] - 16*f_x[i-3] + 3*f_x[i-4])
+            df_x[0][i] /= 3*(x[i] - x[i-4])
+        
+        #midpoints    
+        else:
+            df_x[0][i] = (f_x[i-2] - 8*f_x[i-1] + 8*f_x[i+1] - f_x[i+2])/(3*(x[i+2] - x[i-2]))
+    
+    return df_x
+    
+#Example
+#part a
+x9a = [2.1, 2.2, 2.3, 2.4, 2.5, 2.6]
+f_x9a = [-1.709847, -1.373823, -1.119214, -0.9160143, -0.7470223, -0.6015966]
+
+#part b
+x9b = [-3, -2.8, -2.6, -2.4, -2.2, -2]
+f_x9b = [9.367879, 8.233241, 7.180350, 6.209329, 5.320305, 4.513417]
