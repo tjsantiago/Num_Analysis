@@ -38,6 +38,140 @@ def f1b(t, y):
 Euler(f1b, 2, 3, 1, h=0.5)
 
 
+#Modified Euler's Method
+def Mod_Euler(f, a, b, alpha, h=None, N=None):
+    '''Uses Modified Euler's method to find a solution to an initial value problem
+    f is the ODE which we would like to solve.
+    a and b are the end points of the problem.
+    alpha is the initial value.
+    Optional parameter h is the step size.
+    Optional parameter N is the number of steps.
+    '''
+    
+    t = a
+    w = alpha
+    print("The starting point is: ")
+    print("(" + str(t) + ", " + str(w) + ")")
+    
+    if h == None and N != None:
+        h = (b - a)/N
+        
+    elif h == None and N == None:
+        h = 0.5
+        N = (b - a)/h
+        
+    elif h != None and N == None:
+        N = (b - a)/h
+    
+    for i in np.arange(1, N+1):
+        w += (h/2)*(f(t, w) + f(a+i*h, w+h*f(t, w)))
+        t = a + i*h
+        
+        if i == N:
+            print("The approximate solution is: (%f, %f)"%(t, w))
+        
+        else:
+            print("The current postion is: (%f, %f)"%(t, w))
+
+#Example
+#Part b
+def f1b(t, y):
+    return 1 + ((t-y)**2)
+
+print("part b)")    
+Mod_Euler(f1b, 2, 3, 1, h=0.5)
+
+#Part c
+def f1c(t, y):
+    return 1 + (y/t)
+
+print("part c)")    
+Mod_Euler(f1c, 1, 2, 2, h=0.25)
+
+#Midpoint Method
+def MP_Method(f, a, b, alpha, h=None, N=None):
+    '''Uses the midpoint method to approximate the solution
+    to an initial value problem.
+    
+    f: ode in form f(t, y)
+    a and b: endpoints
+    alpha: initial value
+    h (optional): step size
+    N (optional): number of steps
+    '''
+    
+    t = a
+    w = alpha
+    print("The starting point is: (%f, %f)"%(t, w))
+    
+    if h == None and N != None:
+        h = (b - a)/N
+        
+    elif h == None and N == None:
+        h = 0.5
+        N = (b - a)/h
+        
+    elif h != None and N == None:
+        N = (b - a)/h
+        
+    for i in np.arange(1, N+1):
+        w += h*f(t + (h/2), w + (h/2)*f(t, w))
+        t = a + i*h
+        
+        if i == N:
+            print("The approximate solution is: (%f, %f)"%(t, w))
+        
+        else:
+            print("The current position is: (%f, %f)"%(t, w))
+
+#Example
+#part c
+def f4c(t, y):
+    return ((y**2) + y)/t
+
+MP_Method(f4c, 1, 3, -2, h=0.2)
+
+
+#Heun's Method
+def Heun(f, a, b, alpha, h=None, N=None):
+    '''Uses Heun's method to approximate a solution to 
+    an initial value problem.
+    
+    f: ode in form f(t, y)
+    a and b: endpoints
+    alpha: initial value
+    h (optional): step size
+    N (optional): number of steps
+    '''
+    
+    t = a
+    w = alpha
+    print("The starting point is: (%f, %f)"%(t, w))
+    
+    if h == None and N != None:
+        h = (b - a)/N
+        
+    elif h == None and N == None:
+        h = 0.5
+        N = (b - a)/h
+        
+    elif h != None and N == None:
+        N = (b - a)/h
+        
+    for i in np.arange(1, N+1):
+        w += (h/4)*(f(t, w) + 3*(f(t + (2*h/3), w + (2*h/3)*f(t + (h/3), w + (h/3)*f(t, w)))))
+        t = a + i*h
+        
+        if i == N:
+            print("The approximate solution is: (%f, %f)"%(t, w))
+        
+        else:
+            print("The current position is: (%f, %f)"%(t, w))
+
+#Example
+Heun(f4c, 1, 3, -2, h=0.2)
+
+
 #Runge-Kutta Method (Order Four)
 
 def RK4(f, a, b, alpha, h=None, N=None):
@@ -85,3 +219,406 @@ def f13a(t, y):
     return t*np.exp(3*t) - 2*y
     
 RK4(f13a, 0, 1, 0, h=0.5)
+
+
+##============================================================================================
+#Adams bashforth methods, examples at bottom (long)
+
+#Adam-Bashforth Two-Step Method
+def AB2(f, a, b, alpha, h=None, N=None):
+    '''Uses the Adam-Bashforth two-step explicit method
+    to approximate the solution to an ODE initial value problem.
+    
+    f: ode in form f(t, y)
+    a and b: endpoints
+    alpha: initial value
+    h (optional): step size
+    N (optional): number of steps
+    '''
+    
+    if h == None and N != None:
+        h = (b - a)/N
+        
+    elif h == None and N == None:
+        h = 0.5
+        N = int((b - a)/h)
+        
+    elif h != None and N == None:
+        N = int((b - a)/h)
+    
+    w = np.zeros((1, N+1))
+    t = np.zeros((1, N+1))
+    
+    w[0][0] = alpha
+    t[0][0] = a
+    
+    w[0][1] = f(t[0][0], w[0][0])
+    t[0][1] = a + h
+    
+    for i in np.arange(2, N+1):
+        w[0][i] = w[0][i-1] + (h/2)*(3*f(t[0][i-1], w[0][i-1]) - f(t[0][i-2], w[0][i-2]))
+        t[0][i] = a + i*h
+        
+        if i == N:
+            print("Approximate solution: (%f, %f)"%(t[0][i], w[0][i]))
+            
+        else:
+            print("Current position: (%f, %f)"%(t[0][i], w[0][i]))
+
+
+#Adam-Bashforth 3-step method
+def AB3(f, a, b, alpha, h=None, N=None):
+    '''Uses the Adam-Bashforth 3-step explicit method
+    to approximate the solution to an ODE initial value problem.
+    
+    f: ode in form f(t, y)
+    a and b: endpoints
+    alpha: initial value
+    h (optional): step size
+    N (optional): number of steps
+    '''
+    
+    if h == None and N != None:
+        h = (b - a)/N
+        
+    elif h == None and N == None:
+        h = 0.5
+        N = int((b - a)/h)
+        
+    elif h != None and N == None:
+        N = int((b - a)/h)
+    
+    w = np.zeros((1, N+1))
+    t = np.zeros((1, N+1))
+    
+    w[0][0] = alpha
+    t[0][0] = a
+    
+    w[0][1] = f(t[0][0], w[0][0])
+    t[0][1] = a + h
+    
+    w[0][2] = f(t[0][1], w[0][1])
+    t[0][2] = a + 2*h
+    
+    for i in np.arange(3, N+1):
+        w[0][i] = w[0][i-1] + (h/12)*(23*f(t[0][i-1], w[0][i-1]) - 16*f(t[0][i-2], w[0][i-2]) + 5*f(t[0][i-3], w[0][i-3]))
+        t[0][i] = a + i*h
+        
+        if i == N:
+            print("Approximate solution: (%f, %f)"%(t[0][i], w[0][i]))
+            
+        else:
+            print("Current position: (%f, %f)"%(t[0][i], w[0][i]))
+
+
+#Adam-Bashforth 4-step method
+def AB4(f, a, b, alpha, h=None, N=None):
+    '''Uses the Adam-Bashforth 4-step explicit method
+    to approximate the solution to an ODE initial value problem.
+    
+    f: ode in form f(t, y)
+    a and b: endpoints
+    alpha: initial value
+    h (optional): step size
+    N (optional): number of steps
+    '''
+    
+    if h == None and N != None:
+        h = (b - a)/N
+        
+    elif h == None and N == None:
+        h = 0.5
+        N = int((b - a)/h)
+        
+    elif h != None and N == None:
+        N = int((b - a)/h)
+    
+    w = np.zeros((1, N+1))
+    t = np.zeros((1, N+1))
+    
+    w[0][0] = alpha
+    t[0][0] = a
+    
+    w[0][1] = f(t[0][0], w[0][0])
+    t[0][1] = a + h
+    
+    w[0][2] = f(t[0][1], w[0][1])
+    t[0][2] = a + 2*h
+    
+    w[0][3] = f(t[0][2], w[0][2])
+    t[0][3] = a + 3*h
+    
+    for i in np.arange(4, N+1):
+        w[0][i] = w[0][i-1] + (h/24)*(55*f(t[0][i-1], w[0][i-1]) - 59*f(t[0][i-2], w[0][i-2]) + 37*f(t[0][i-3], w[0][i-3]) - 9*f(t[0][i-4], w[0][i-4]))
+        t[0][i] = a + i*h
+        
+        if i == N:
+            print("Approximate solution: (%f, %f)"%(t[0][i], w[0][i]))
+            
+        else:
+            print("Current position: (%f, %f)"%(t[0][i], w[0][i]))
+
+
+#Adam-Bashforth 5-step method
+def AB5(f, a, b, alpha, h=None, N=None):
+    '''Uses the Adam-Bashforth 5-step explicit method
+    to approximate the solution to an ODE initial value problem.
+    
+    f: ode in form f(t, y)
+    a and b: endpoints
+    alpha: initial value
+    h (optional): step size
+    N (optional): number of steps
+    '''
+    
+    if h == None and N != None:
+        h = (b - a)/N
+        
+    elif h == None and N == None:
+        h = 0.5
+        N = int((b - a)/h)
+        
+    elif h != None and N == None:
+        N = int((b - a)/h)
+    
+    w = np.zeros((1, N+1))
+    t = np.zeros((1, N+1))
+    
+    w[0][0] = alpha
+    t[0][0] = a
+    
+    w[0][1] = f(t[0][0], w[0][0])
+    t[0][1] = a + h
+    
+    w[0][2] = f(t[0][1], w[0][1])
+    t[0][2] = a + 2*h
+    
+    w[0][3] = f(t[0][2], w[0][2])
+    t[0][3] = a + 3*h
+    
+    w[0][4] = f(t[0][3], w[0][3])
+    t[0][4] = a + 4*h
+    
+    for i in np.arange(5, N+1):
+        w[0][i] = w[0][i-1] + (h/720)*(1901*f(t[0][i-1], w[0][i-1]) - 2774*f(t[0][i-2], w[0][i-2]) + 2616*f(t[0][i-3], w[0][i-3]) - 1274*f(t[0][i-4], w[0][i-4]) + 251*f(t[0][i-5], w[0][i-5]))
+        t[0][i] = a + i*h
+        
+        if i == N:
+            print("Approximate solution: (%f, %f)"%(t[0][i], w[0][i]))
+            
+        else:
+            print("Current position: (%f, %f)"%(t[0][i], w[0][i]))
+    
+ 
+#Adam's 4th-order predictor-corrector
+def A4PC(f, a, b, alpha, h=None, N=None):
+    '''Uses the Adam's 4th-order predictor-corrector method
+    to approximate the solution to an ODE initial value problem.
+    
+    f: ode in form f(t, y)
+    a and b: endpoints
+    alpha: initial value
+    h (optional): step size
+    N (optional): number of steps
+    '''
+    
+    if h == None and N != None:
+        h = (b - a)/N
+        
+    elif h == None and N == None:
+        h = 0.5
+        N = int((b - a)/h)
+        
+    elif h != None and N == None:
+        N = int((b - a)/h)
+    
+    w = np.zeros((1, N+1))
+    t = np.zeros((1, N+1))
+    
+    w[0][0] = alpha
+    t[0][0] = a
+    
+    print("Starting point: (%f, %f)"%(t[0][0], w[0][0]))
+    
+    for i in np.arange(1, 4):
+        K_1 = h*f(t[0][i-1], w[0][i-1])
+        K_2 = h*f(t[0][i-1] + (h/2), w[0][i-1] + (K_1/2))
+        K_3 = h*f(t[0][i-1] + (h/2), w[0][i-1] + (K_2/2))
+        K_4 = h*f(t[0][i-1] + h, w[0][i-1] + K_3)
+        
+        w[0][i] = w[0][i-1] + ((K_1 + 2*K_2 + 2*K_3 + K_4)/6)
+        t[0][i] = a + i*h
+        
+        print("Current position: (%f, %f)"%(t[0][i], w[0][i]))
+        
+    for i in np.arange(4, N+1):
+        t[0][i] = a + i*h
+        w[0][i] = w[0][3] + h*(55*f(t[0][3], w[0][3]) - 59*f(t[0][2], w[0][2]) + 37*f(t[0][1], w[0][1]) - 9*f(t[0][0], w[0][0]))/24
+        w[0][i] = w[0][3] + h*(9*f(t[0][i], w[0][i]) + 19*f(t[0][3], w[0][3]) - 5*f(t[0][2], w[0][2]) + f(t[0][0], w[0][0]))/24
+        
+        if i == N:
+            print("Approximate solution: (%f, %f)"%(t[0][i], w[0][i]))
+        
+        else:
+            print("Current position: (%f, %f)"%(t[0][i], w[0][i]))
+        
+        for j in (0, 1, 2):
+            t[0][j] = t[0][j+1]
+            w[0][j] = w[0][j+1]
+        
+        t[0][3] = t[0][i]
+        w[0][3] = w[0][i]
+
+#Examples
+#part a
+print("part a)")
+def fs6_1a(t, y):
+    return t*np.exp(3*t) - 2*y
+    
+print("2-step: ")
+AB2(fs6_1a, 0, 1, 0, h=0.2)
+print("3-step: ")
+AB3(fs6_1a, 0, 1, 0, h=0.2)
+print("4-step: ")
+AB4(fs6_1a, 0, 1, 0, h=0.2)
+print("5-step: ")
+AB5(fs6_1a, 0, 1, 0, h=0.2)
+print("Predictor-Corrector: ")
+A4PC(fs6_1a, 0, 1, 0, h=0.2)
+
+##===========================================================================================================================
+
+#Runge-Kutta Method for system of differential equations
+def RK_sys(f, a, b, alpha, h=None, N=None):
+    '''Uses the runge-kutta method for system of differential equations
+    to approximate a solution to the system of ODE initial value problems.
+    
+    f: an array of odes in the form f(t, u_1, u_2,..., u_m)
+    a and b: endpoints
+    alpha: an array of initial values
+    h (optional): step size
+    N (optional): step count
+    '''
+    
+    if h == None and N != None:
+        h = (b - a)/N
+        
+    elif h == None and N == None:
+        h = 0.5
+        N = int((b - a)/h)
+        
+    elif h != None and N == None:
+        N = int((b - a)/h)
+    
+    m = np.size(alpha)
+    w = np.zeros((1, m))
+    t = a
+    
+    for j in np.arange(0, m):
+        w[0][j] = alpha[j]
+        
+    k = np.zeros((4, N+1))
+    
+    for i in np.arange(1, N+1):
+        for j in np.arange(0, m):
+            args = w[0][:]
+            k[0][j] = h*(f[j](t, *args))
+        
+        for j in np.arange(0, m):
+            args = [w[0][i] + (1/2)*k[0][i] for i in np.arange(m)]
+            k[1][j] = h*f[j](t, *args)
+            
+        for j in np.arange(0, m):
+            args = [w[0][i] + (1/2)*k[1][i] for i in np.arange(m)]
+            k[2][j] = h*f[j](t, *args)
+            
+        for j in np.arange(0, m):
+            args = [w[0][i] + (1/2)*k[2][i] for i in np.arange(m)]
+            k[3][j] = h*f[j](t, *args)
+            
+        for j in np.arange(0, m):
+            w[0][j] = w[0][j] + (k[0][j] + 2*k[1][j] + 2*k[2][j] + k[3][j])/6
+            
+        t = a + i*h
+        
+        if i ==N:
+            print("Approximate solutions at t = %f: "%t)
+            for i in np.arange(0, m):
+                print("w_%d = %f"%(i, w[0][i]))            
+
+#Example
+#part b
+print("part b)")
+def f4b_1(t, u_1, u_2):
+    return u_2
+    
+def f4b_2(t, u_1, u_2):
+    return (-3*t - t*u_2 + 4*u_1)/(t**2)
+    
+f_array4b = np.array([f4b_1, f4b_2])
+alpha_array4b = np.array([4, 3])
+RK_sys(f_array4b, 1, 3, alpha_array4b, h=0.2)
+
+
+#Trapezoidal with Newton Iteration
+def Trap_New(f, fy, a, b, alpha, h=0.5, N=None, TOL=1e-3, M=1000):
+    '''Uses the trapezoidal rule with newton iteration to approximate 
+    a solution to an initial value problem.
+    
+    Parameters:
+        f: an ODE in the form f(t, y)
+        fy: derivative of the ODE with respect to y
+        a and b: endpoints
+        alpha: initial value
+        h: optional step size. Default is 0.5
+        N: optional step count
+        TOL: optional tolerance value. Default is 0.001
+        M: optional maximum number of iterations. Default is 1000
+    '''
+    
+    if N != None:
+        h = (b - a)/N
+        
+    elif N == None:
+        N = int((b - a)/h)
+    
+    t = a
+    w = alpha
+    
+    print("Starting point: (%f, %f)"%(t, w))
+    
+    for i in range(1, N+1):
+        k_1 = w + (h/2)*(f(t, w))
+        w_0 = k_1
+        j = 1
+        FLAG = 0
+        
+        while FLAG == 0:
+            w = w_0 - ((w_0 - (h/2)*f(t+h, w_0) - k_1)/(1 - (h/2)*fy(t+h, w_0)))
+            
+            if abs(w - w_0) < TOL:
+                FLAG = 1
+            
+            else:
+                j += 1
+                w_0 = w
+                if j > M:
+                    print("Maximum number of iterations exceeded")
+                    print("Current point: (%f, %f)"%(t, w))
+                    return
+                    
+        t = a + i*h
+        
+        if i == N:
+            print("Approximate solution: (%f, %f)"%(t, w))
+    
+    return
+
+#Example
+def f1c(t, y):
+    return -20*y + 20*np.sin(t) + np.cos(t)
+    
+def fy1c(t, y):
+    return -20
+
+Trap_New(f1c, fy1c, 0, 2, 1, h=0.25, TOL=1e-5)
