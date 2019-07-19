@@ -1,0 +1,66 @@
+#Composite Simpson's Rule
+
+def Comp_Simpsons(f, a, b, n):
+    '''Uses composite simpson's rule to approximate the integral of
+    a function f from a to b
+    '''
+    
+    h = (b - a)/n
+    
+    XI_0 = f(a) + f(b)
+    XI_1 = 0
+    XI_2 = 0
+    
+    for i in np.arange(1, n):
+        X = a + i*h
+        
+        if i % 2 == 0:
+            XI_2 += f(X)
+        else:
+            XI_1 += f(X)
+    
+    XI = h*(XI_0 + 2*XI_2 + 4*XI_1)/3
+    
+    return XI
+    
+    
+#Composite Midpoint Rule
+
+def Comp_Midpoint(f, a, b, n):
+    '''Uses composite midpoint rule to approximate the integral of
+    a function f from a to b
+    '''
+    
+    h = (b - a)/n
+    result = 0
+    
+    for i in np.arange(n):
+        result += f(a + h/2 + i*h)
+    
+    return h*result 
+    
+#Example
+#Numbers 3/5
+#part a
+def f35a(x):
+    return x*np.log(x)
+
+print("Part a: ")
+print(Comp_Simpsons(f35a, 1, 2, 4))
+print(Comp_Midpoint(f35a, 1, 2, 6))
+
+#part c
+def f35c(x):
+    return 2/((x**2)+4)
+
+print("Part c: ")    
+print(Comp_Simpsons(f35c, 0, 2, 6))
+print(Comp_Midpoint(f35c, 0, 2, 8))
+
+#part d
+def f35d(x):
+    return (x**2)*np.cos(x)
+
+print("Part d: ")
+print(Comp_Simpsons(f35d, 0, np.pi, 6))
+print(Comp_Midpoint(f35d, 0, np.pi, 8))
